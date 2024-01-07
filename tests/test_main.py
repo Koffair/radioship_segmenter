@@ -1,4 +1,4 @@
-"""Tests for main() of `radioship_transcriber` package."""
+"""Tests for main() of `radioship_segmenter` package."""
 
 import pytest
 import os

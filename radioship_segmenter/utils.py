@@ -19,9 +19,8 @@ warnings.filterwarnings(
 )
 
 
-def make_transcript(
-    audio_file_path: str, out_path: str, model: SpeechRecognitionModel, timestamps: bool
-) -> None:
+def make_sections(
+    audio_file_path: str, out_path: str) -> None:
     """Creates a transcirpt for a provided mp3 audio segment."""
 
     # prepare subfolders in slicing and segmenting
@@ -36,29 +35,30 @@ def make_transcript(
 
     # do the segmenting:
     segmenting(slices_folder, segment_folder)
-    segment_lst = [
-        os.path.join(segment_folder, f) for f in sorted(os.listdir(segment_folder))
-    ]
-    segment_lst = [f for f in segment_lst if os.path.isfile(f)]
 
-    transcriptions_without_decoder = model.transcribe(segment_lst)
-    transcriptions_without_decoder = [
-        e["transcription"] for e in transcriptions_without_decoder
-    ]
-    # send in the metadata, and zip it to the transcript lines, write them together.
-    slice_meta = [e.split("_")[-1].strip(".mp3") for e in segment_lst]
-    write_transcript(
-        audio_file_path,
-        out_path,
-        transcriptions_without_decoder,
-        slice_meta,
-        timestamps,
-    )
-    logging.info("Transcipt created for: %s", audio_file_path)
+    # segment_lst = [
+    #     os.path.join(segment_folder, f) for f in sorted(os.listdir(segment_folder))
+    # ]
+    # segment_lst = [f for f in segment_lst if os.path.isfile(f)]
 
-    # DELETE THE INTERIM FOLDERS!
-    shutil.rmtree(segment_folder)  # should these be temporary folders instead?
-    shutil.rmtree(slices_folder)
+    # transcriptions_without_decoder = model.transcribe(segment_lst)
+    # transcriptions_without_decoder = [
+    #     e["transcription"] for e in transcriptions_without_decoder
+    # ]
+    # # send in the metadata, and zip it to the transcript lines, write them together.
+    # slice_meta = [e.split("_")[-1].strip(".mp3") for e in segment_lst]
+    # write_transcript(
+    #     audio_file_path,
+    #     out_path,
+    #     transcriptions_without_decoder,
+    #     slice_meta,
+    #     timestamps,
+    # )
+    # logging.info("Transcipt created for: %s", audio_file_path)
+
+    # # DELETE THE INTERIM FOLDERS!
+    # shutil.rmtree(segment_folder)  # should these be temporary folders instead?
+    # shutil.rmtree(slices_folder)
 
 
 def slicing(slices_folder: str, audio_file_path: str, slicer: AudioSegment) -> None:

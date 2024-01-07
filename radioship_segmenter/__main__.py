@@ -1,11 +1,9 @@
-"""This is the CLI of the transctipter tool.
+"""This is the CLI of the segmenter tool.
 
 The tool requeires an input and an ouput folder to be specified.
-The input folder should contain mp3 files. 
+The input folder should contain mp3 files. """
 
-There is a default model path provided that can be replaced."""
-
-import radioship_transcriber.utils as utils
+import radioship_segmenter.utils as utils
 
 import os
 import argparse
@@ -16,7 +14,7 @@ import datetime
 from huggingsound import SpeechRecognitionModel  # type: ignore
 
 
-def transcribe(in_path: str, out_path: str, model_path: str, timestamps: bool) -> None:
+def do_segmentation(in_path: str, out_path: str) -> None:
     """Set up logger and interim folders, create transcriptions."""
 
     if not os.path.isdir(out_path):
@@ -103,11 +101,6 @@ If you're not sure how to do this, consider seeking assistance from your system 
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
-    logging.info("Timstamp is set to: %i", timestamps)
-
-    # fetch model
-    model = SpeechRecognitionModel(model_path)
-    logging.info("Model %s loaded.", model_path)
 
     # create interim folders for processing slices & segments
     slices_path = os.path.join(out_path, "interim_data/slices")
@@ -123,21 +116,14 @@ If you're not sure how to do this, consider seeking assistance from your system 
         os.path.abspath(os.path.join(in_path, f)) for f in os.listdir(in_path)
     ]
     mp3s = [e for e in full_paths if os.path.isfile(e) and e[-4:] == ".mp3"]
-
     for mp3 in mp3s:
-        # check outpout to avoid reruns
-        if utils.is_processed(mp3, out_path):
-            logging.info("%s already has a transcirpt in %s", mp3, out_path)
-            continue
-        # create transcript
-        utils.make_transcript(mp3, out_path, model, timestamps)
+        # create segmentation
+        utils.make_sections(mp3, out_path)
 
 
 def main():
-    """This is the entry point for the CLI of the radioship transcript tool."""
-    DEFAULT_MODEL = "radioship/wav2vec2-large-xlsr-53-hu"
-
-    parser = argparse.ArgumentParser("Create transript for mp3 files.")
+    """This is the entry point for the CLI of the radioship segmenter tool."""
+    parser = argparse.ArgumentParser("Create segments from mp3 files.")
     parser.add_argument(
         "-i",
         "--in_path",
@@ -154,24 +140,9 @@ def main():
         required=True,
         help="Path to output directory",
     )
-    parser.add_argument(
-        "-m",
-        "--model_path",
-        type=str,
-        metavar="",
-        default=DEFAULT_MODEL,
-        required=False,
-        help="Address to transcripter model",
-    )
-
-    parser.add_argument("--timestamp", action="store_true", required=False)
-    parser.add_argument(
-        "--no-timestamp", dest="timestamp", action="store_false", required=False
-    )
-    parser.set_defaults(timestamp=True)
     args = parser.parse_args()
 
-    transcribe(args.in_path, args.out_path, args.model_path, args.timestamp)
+    do_segmentation(args.in_path, args.out_path)
 
 
 if __name__ == "__main__":

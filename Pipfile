@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+torch = "~=1.10"
+huggingsound = "*"
+pydub = "*"
+inaspeechsegmenter = "*"
+ffprobe = "*"
+
+[dev-packages]
+cookiecutter = "*"
+pytest = "*"
+pre-commit = "*"
+black = "*"
+pylint = "*"
+mypy = "*"
+coverage = "*"
+
+[requires]
+python_version = "3.10.10"
